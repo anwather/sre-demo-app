@@ -22,10 +22,8 @@ spec:
       labels:
         app.kubernetes.io/name: sre-demo-api
         app.kubernetes.io/part-of: sre-demo
-        azure.workload.identity/use: "true"
         purpose: sre-demo
     spec:
-      serviceAccountName: sre-demo-api
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       securityContext:
@@ -50,12 +48,6 @@ spec:
           envFrom:
             - configMapRef:
                 name: sre-demo-api-config
-          env:
-            - name: APPLICATIONINSIGHTS_CONNECTION_STRING
-              valueFrom:
-                secretKeyRef:
-                  name: sre-demo-api-telemetry
-                  key: connection-string
           resources:
             requests:
               cpu: 100m

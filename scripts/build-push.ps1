@@ -84,8 +84,6 @@ try {
                 --detach `
                 --rm `
                 --name $containerName `
-                --env 'Storage__AccountUrl=https://example.blob.core.windows.net' `
-                --env 'APPLICATIONINSIGHTS_CONNECTION_STRING=InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=https://example.invalid/' `
                 $image).Trim()
             Assert-LastExitCode 'Container smoke-test start'
 

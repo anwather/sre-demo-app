@@ -1,7 +1,5 @@
-using Azure;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using SreDemo.Api.Faults;
 
 namespace SreDemo.Api;
 
@@ -14,14 +12,8 @@ public sealed class ApiExceptionHandler(
         Exception exception,
         CancellationToken cancellationToken)
     {
-        var (statusCode, title) = exception switch
-        {
-            StorageFailureInjectedException =>
-                (StatusCodes.Status503ServiceUnavailable, "Injected storage dependency failure"),
-            RequestFailedException =>
-                (StatusCodes.Status503ServiceUnavailable, "Blob Storage dependency unavailable"),
-            _ => (StatusCodes.Status500InternalServerError, "Unexpected server error")
-        };
+        const int statusCode = StatusCodes.Status500InternalServerError;
+        const string title = "Unexpected server error";
 
         logger.LogError(
             exception,
@@ -37,9 +29,7 @@ public sealed class ApiExceptionHandler(
             {
                 Status = statusCode,
                 Title = title,
-                Detail = statusCode == StatusCodes.Status500InternalServerError
-                    ? "The server encountered an unexpected error."
-                    : exception.Message,
+                Detail = "The server encountered an unexpected error.",
                 Extensions = { ["traceId"] = httpContext.TraceIdentifier }
             },
             Exception = exception

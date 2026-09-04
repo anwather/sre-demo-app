@@ -7,8 +7,7 @@
       "launchBrowser": false,
       "applicationUrl": "http://localhost:8080",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "Storage__AccountUrl": "https://example.blob.core.windows.net"
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     }
   }
