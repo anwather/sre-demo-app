@@ -159,7 +159,19 @@ kubectl rollout status "deployment/$deployment" \
   --namespace "$namespace" \
   --timeout 300s
 
+kubectl wait "service/$deployment" \
+  --namespace "$namespace" \
+  --for=jsonpath='{.status.loadBalancer.ingress[0].ip}' \
+  --timeout 300s
+
 kubectl get pods,service,pdb \
   --namespace "$namespace" \
   --selector 'app.kubernetes.io/name=sre-demo-api' \
   --output wide
+
+service_ip="$(
+  kubectl get "service/$deployment" \
+    --namespace "$namespace" \
+    --output jsonpath='{.status.loadBalancer.ingress[0].ip}'
+)"
+printf 'Application URL: http://%s/\n' "$service_ip"

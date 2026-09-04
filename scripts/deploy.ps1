@@ -119,8 +119,20 @@ foreach ($manifestFile in $manifestFiles) {
 & kubectl rollout status "deployment/$deployment" --namespace $namespace --timeout 300s
 Assert-LastExitCode 'Deployment rollout'
 
+& kubectl wait "service/$deployment" `
+    --namespace $namespace `
+    --for="jsonpath={.status.loadBalancer.ingress[0].ip}" `
+    --timeout 300s
+Assert-LastExitCode 'Internal load balancer address'
+
 & kubectl get pods,service,pdb `
     --namespace $namespace `
     --selector 'app.kubernetes.io/name=sre-demo-api' `
     --output wide
 Assert-LastExitCode 'Post-deployment status'
+
+$serviceIp = ((& kubectl get "service/$deployment" `
+    --namespace $namespace `
+    --output 'jsonpath={.status.loadBalancer.ingress[0].ip}') -join "`n").Trim()
+Assert-LastExitCode 'Internal load balancer lookup'
+Write-Host "Application URL: http://$serviceIp/"

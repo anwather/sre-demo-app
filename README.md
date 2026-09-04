@@ -9,7 +9,7 @@ other managed-service dependency.
 - Namespace
 - ConfigMap
 - Deployment with two replicas
-- Internal `ClusterIP` Service
+- Internal Azure Load Balancer Service at `10.1.3.250`
 - Startup, liveness, and readiness probes
 - PodDisruptionBudget requiring one available replica
 - CPU and memory requests and limits
@@ -119,12 +119,13 @@ authenticated registry:
 
 ## Access
 
-The Service is internal:
+The Service is published through an Azure internal load balancer at `10.1.3.250`.
+It is reachable from the jump VM and other connected networks permitted by the hub
+firewall and AKS subnet NSG:
 
 ```bash
-kubectl port-forward -n sre-demo service/sre-demo-api 8080:80
-curl http://localhost:8080/
-curl http://localhost:8080/api/products
+curl http://10.1.3.250/
+curl http://10.1.3.250/api/products
 ```
 
 Create an order:
@@ -134,7 +135,7 @@ curl \
   --request POST \
   --header 'Content-Type: application/json' \
   --data '{"productId":1,"quantity":2}' \
-  http://localhost:8080/api/orders
+  http://10.1.3.250/api/orders
 ```
 
 ## Status and rollback

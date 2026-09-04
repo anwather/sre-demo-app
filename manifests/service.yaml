@@ -5,8 +5,11 @@ metadata:
   namespace: sre-demo
   labels:
     app.kubernetes.io/name: sre-demo-api
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-internal: "true"
+    service.beta.kubernetes.io/azure-load-balancer-ipv4: "10.1.3.250"
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   selector:
     app.kubernetes.io/name: sre-demo-api
   ports:
