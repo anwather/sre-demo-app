@@ -43,11 +43,14 @@ Example order:
 
 Run from a Linux host that can reach the private AKS API and private ACR endpoint:
 
-- .NET 8 SDK
 - Docker
 - Azure CLI
 - `kubectl`
 - Optional: Trivy
+
+The .NET SDK does not need to be installed on the jump host. When `dotnet` is absent,
+`validate.sh` builds the Dockerfile's test stage and runs the test suite inside the
+official .NET 8 SDK container.
 
 Authenticate and select the deployment subscription:
 

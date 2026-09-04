@@ -41,9 +41,14 @@ script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 project_root="$(cd -- "$script_dir/.." && pwd)"
 cd "$project_root"
 
-require_command dotnet
-
-dotnet test ./SreDemo.sln --configuration Release
+if command -v dotnet >/dev/null 2>&1; then
+  dotnet test ./SreDemo.sln --configuration Release
+else
+  require_command docker
+  docker info >/dev/null
+  printf 'dotnet is not installed; running tests in the .NET 8 SDK container.\n'
+  docker build --target test --tag sre-demo-api:test-validation .
+fi
 
 for script in ./scripts/*.sh; do
   bash -n "$script"

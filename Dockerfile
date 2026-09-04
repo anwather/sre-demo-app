@@ -14,6 +14,16 @@ RUN dotnet publish src/SreDemo.Api/SreDemo.Api.csproj \
     --output /app/publish \
     /p:UseAppHost=false
 
+FROM build AS test
+
+COPY tests/SreDemo.Api.Tests/SreDemo.Api.Tests.csproj tests/SreDemo.Api.Tests/
+RUN dotnet restore tests/SreDemo.Api.Tests/SreDemo.Api.Tests.csproj
+
+COPY tests/SreDemo.Api.Tests/ tests/SreDemo.Api.Tests/
+RUN dotnet test tests/SreDemo.Api.Tests/SreDemo.Api.Tests.csproj \
+    --configuration Release \
+    --no-restore
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0-noble-chiseled-extra AS runtime
 WORKDIR /app
 
