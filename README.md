@@ -41,29 +41,42 @@ Example order:
 
 ## Prerequisites
 
-Run from a host that can reach the private AKS API and private ACR endpoint:
+Run from a Linux host that can reach the private AKS API and private ACR endpoint:
 
-- PowerShell 7
 - .NET 8 SDK
 - Docker
 - Azure CLI
 - `kubectl`
 - Optional: Trivy
 
-## Validate
+Authenticate and select the deployment subscription:
 
-```powershell
-./scripts/validate.ps1 -SkipDocker
+```bash
+az login --use-device-code
+az account set --subscription 5587ff14-5a95-41f2-8ce4-d2f702958783
 ```
 
-Remove `-SkipDocker` to include a production container build.
+Clone the repository:
+
+```bash
+git clone https://github.com/anwather/sre-demo-app.git
+cd sre-demo-app
+```
+
+## Validate
+
+```bash
+./scripts/validate.sh --skip-docker
+```
+
+Remove `--skip-docker` to include a production container build.
 
 ## Build and push the image to ACR
 
-```powershell
-$image = ./scripts/build-push.ps1 `
-  -AcrName 'acrsredemoanw260904' `
-  -ImageTag '20260904.1'
+```bash
+./scripts/build-push.sh \
+  --acr-name acrsredemoanw260904 \
+  --image-tag 20260904.1
 ```
 
 The script builds the image locally on the VM, validates that it runs as a non-root
@@ -71,42 +84,46 @@ container, performs a health check, and pushes the resulting image to the privat
 
 ## Apply the manifests to AKS
 
-```powershell
-./scripts/deploy.ps1 `
-  -Action Deploy `
-  -AksResourceGroup 'rg-sredemo-aks-aue' `
-  -AksName 'aks-sredemo-aue' `
-  -AcrName 'acrsredemoanw260904' `
-  -ImageTag '20260904.1'
+```bash
+./scripts/deploy.sh \
+  --aks-resource-group rg-sredemo-aks-aue \
+  --aks-name aks-sredemo-aue \
+  --acr-name acrsredemoanw260904 \
+  --image-tag 20260904.1
 ```
 
 ## Access
 
 The Service is internal:
 
-```powershell
+```bash
 kubectl port-forward -n sre-demo service/sre-demo-api 8080:80
-Invoke-RestMethod http://localhost:8080/
-Invoke-RestMethod http://localhost:8080/api/products
+curl http://localhost:8080/
+curl http://localhost:8080/api/products
 ```
 
 Create an order:
 
-```powershell
-Invoke-RestMethod -Method Post `
-  -Uri http://localhost:8080/api/orders `
-  -ContentType application/json `
-  -Body '{"productId":1,"quantity":2}'
+```bash
+curl \
+  --request POST \
+  --header 'Content-Type: application/json' \
+  --data '{"productId":1,"quantity":2}' \
+  http://localhost:8080/api/orders
 ```
 
 ## Status and rollback
 
-```powershell
-./scripts/deploy.ps1 -Action Status `
-  -AksResourceGroup 'rg-sredemo-aks-aue' `
-  -AksName 'aks-sredemo-aue'
+```bash
+./scripts/deploy.sh \
+  --action status \
+  --aks-resource-group rg-sredemo-aks-aue \
+  --aks-name aks-sredemo-aue
 
-./scripts/deploy.ps1 -Action Rollback `
-  -AksResourceGroup 'rg-sredemo-aks-aue' `
-  -AksName 'aks-sredemo-aue'
+./scripts/deploy.sh \
+  --action rollback \
+  --aks-resource-group rg-sredemo-aks-aue \
+  --aks-name aks-sredemo-aue
 ```
+
+PowerShell equivalents remain available in `scripts/*.ps1`.
