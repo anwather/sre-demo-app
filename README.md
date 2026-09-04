@@ -41,7 +41,8 @@ Example order:
 
 ## Prerequisites
 
-Run from a Linux host that can reach the private AKS API and private ACR endpoint:
+Builds can run from any authenticated machine with internet access to ACR. Applying the
+manifests must run from a Linux host that can reach the private AKS API.
 
 - Docker
 - Azure CLI
@@ -82,8 +83,8 @@ Remove `--skip-docker` to include a production container build.
   --image-tag 20260904.1
 ```
 
-The script builds the image locally on the VM, validates that it runs as a non-root
-container, performs a health check, and pushes the resulting image to the private ACR.
+The script builds the image locally, validates that it runs as a non-root container,
+performs a health check, and pushes the resulting image to ACR.
 
 ### Optional ACR Tasks build
 
@@ -96,10 +97,15 @@ To submit the source to ACR instead of building with the jump host's Docker engi
   --agent-pool <acr-agent-pool-name>
 ```
 
-This workflow requires only Azure CLI on the jump host. The deployed registry has public
-network access disabled, so the shared ACR Tasks worker pool cannot reach it. A dedicated
-ACR agent pool with private network access must be provisioned before this command can
-run successfully. The script checks this condition before queuing the build.
+This workflow requires only Azure CLI and can run from the local machine. It uploads the
+source to a shared ACR Task, builds the Linux image in Azure, and pushes the result to the
+authenticated registry:
+
+```bash
+./scripts/build-acr.sh \
+  --acr-name acrsredemoanw260904 \
+  --image-tag 20260904.1
+```
 
 ## Apply the manifests to AKS
 
