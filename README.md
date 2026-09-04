@@ -85,6 +85,22 @@ Remove `--skip-docker` to include a production container build.
 The script builds the image locally on the VM, validates that it runs as a non-root
 container, performs a health check, and pushes the resulting image to the private ACR.
 
+### Optional ACR Tasks build
+
+To submit the source to ACR instead of building with the jump host's Docker engine:
+
+```bash
+./scripts/build-acr.sh \
+  --acr-name acrsredemoanw260904 \
+  --image-tag 20260904.1 \
+  --agent-pool <acr-agent-pool-name>
+```
+
+This workflow requires only Azure CLI on the jump host. The deployed registry has public
+network access disabled, so the shared ACR Tasks worker pool cannot reach it. A dedicated
+ACR agent pool with private network access must be provisioned before this command can
+run successfully. The script checks this condition before queuing the build.
+
 ## Apply the manifests to AKS
 
 ```bash
