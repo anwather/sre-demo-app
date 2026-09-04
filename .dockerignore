@@ -1,0 +1,11 @@
+**/bin
+**/obj
+**/TestResults
+.azure
+.git
+.gitignore
+.vs
+.vscode
+*.md
+manifests
+scripts

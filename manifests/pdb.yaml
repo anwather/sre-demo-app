@@ -1,0 +1,12 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: sre-demo-api
+  namespace: sre-demo
+  labels:
+    app.kubernetes.io/name: sre-demo-api
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sre-demo-api
